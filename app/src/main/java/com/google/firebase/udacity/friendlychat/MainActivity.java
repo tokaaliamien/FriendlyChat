@@ -1,8 +1,6 @@
 package com.google.firebase.udacity.friendlychat;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -23,7 +20,6 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -36,8 +32,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -210,13 +204,6 @@ public class MainActivity extends AppCompatActivity {
         mPhotoPickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*Intent intent = new Intent(Intent.ACTION_PICK);
-                intent.setType("image/*");
-                //intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-                Toast.makeText(MainActivity.this,"Upload imge",Toast.LENGTH_SHORT).show();
-
-                startActivityForResult(intent, RC_PHOTO_PICKER);*/
-
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/jpeg");
                 intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
@@ -234,58 +221,26 @@ public class MainActivity extends AppCompatActivity {
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "Sign in canceled", Toast.LENGTH_SHORT).show();
                 finish();
-            } else if (requestCode == RC_PHOTO_PICKER && resultCode == RESULT_OK) {
-
-                Uri selectedImageUri = data.getData();
-
-                // Get a reference to store file at chat_photos/<FILENAME>
-                StorageReference photoRef = mChatPhotosStorageReference.child(selectedImageUri.getLastPathSegment());
-
-                // Upload file to Firebase Storage
-                photoRef.putFile(selectedImageUri)
-                        .addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                // When the image has successfully uploaded, we get its download URL
-                                Uri downloadUrl = taskSnapshot.getDownloadUrl();
-
-                                // Set the download URL to the message box, so that the user can send it to the database
-                                FriendlyMessage friendlyMessage = new FriendlyMessage(null, mUsername, downloadUrl.toString());
-                                mDatabaseReference.push().setValue(friendlyMessage);
-                            }
-                        });
-
-                /*Uri selectedImageUri = data.getData();
-                Log.e(TAG,"URI: "+selectedImageUri);
-
-                StorageReference photoRef = mChatPhotosStorageReference.child(selectedImageUri.getLastPathSegment());
-                photoRef.putFile(selectedImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Toast.makeText(MainActivity.this,"Upload successful",Toast.LENGTH_SHORT).show();
-
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(MainActivity.this,"Upload failure",Toast.LENGTH_SHORT).show();
-
-
-                    }
-                });
-
-                photoRef.putFile(selectedImageUri)
-                        .addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                // When the image has successfully uploaded, we get its download URL
-                                Uri downloadUrl = taskSnapshot.getDownloadUrl();
-
-                                // Set the download URL to the message box, so that the user can send it to the database
-                                FriendlyMessage friendlyMessage = new FriendlyMessage(null, mUsername, downloadUrl.toString());
-                                mDatabaseReference.push().setValue(friendlyMessage);
-                            }
-                        });*/
-
             }
+        } else if (requestCode == RC_PHOTO_PICKER && resultCode == RESULT_OK) {
+
+            Uri selectedImageUri = data.getData();
+
+            // Get a reference to store file at chat_photos/<FILENAME>
+            StorageReference photoRef = mChatPhotosStorageReference.child(selectedImageUri.getLastPathSegment());
+
+            // Upload file to Firebase Storage
+            photoRef.putFile(selectedImageUri)
+                    .addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            // When the image has successfully uploaded, we get its download URL
+                            Uri downloadUrl = taskSnapshot.getDownloadUrl();
+
+                            // Set the download URL to the message box, so that the user can send it to the database
+                            FriendlyMessage friendlyMessage = new FriendlyMessage(null, mUsername, downloadUrl.toString());
+                            mDatabaseReference.push().setValue(friendlyMessage);
+                        }
+                    });
         }
     }
 
